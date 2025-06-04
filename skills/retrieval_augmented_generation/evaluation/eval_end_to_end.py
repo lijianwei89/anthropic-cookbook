@@ -1,5 +1,5 @@
 from typing import Dict, Union, Any, List
-from anthropic import Anthropic
+from openai import OpenAI
 import re
 import os
 import xml.etree.ElementTree as ET
@@ -32,20 +32,23 @@ def evaluate_end_to_end(query, generated_answer, correct_answer):
     </evaluation>
     """
     
-    client = Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
+    client = OpenAI(
+        api_key=os.getenv('DASHSCOPE_API_KEY'),
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    )
     try:
-        response = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="qwen-plus",
             max_tokens=1500,
             messages=[
                 {"role": "user", "content": prompt},
-                {"role": "assistant", "content": "<evaluation>"}
+                {"role": "assistant", "content": "<evaluation>"},
             ],
             temperature=0,
-            stop_sequences=["</evaluation>"]
+            stop=["</evaluation>"]
         )
-        
-        response_text = response.content[0].text
+
+        response_text = response.choices[0].message.content
 
         # Use regex to extract explanation and is_correct
         explanation_match = re.search(r'<explanation>(.*?)</explanation>', response_text, re.DOTALL)
