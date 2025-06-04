@@ -2,9 +2,12 @@ import json
 import os
 from typing import Callable, List, Dict, Any, Tuple, Set
 from vectordb import VectorDB, SummaryIndexedVectorDB
-from anthropic import Anthropic
+from openai import OpenAI
 
-client = Anthropic(api_key=os.environ.get('ANTHROPIC_API_KEY'))
+client = OpenAI(
+    api_key=os.getenv('DASHSCOPE_API_KEY'),
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
 
 # Initialize the VectorDB
 db = VectorDB("anthropic_docs")
@@ -105,16 +108,19 @@ def _rerank_results(query: str, results: List[Dict], k: int = 5) -> List[Dict]:
     <relevant_indices>put the numbers of your indices here, seeparted by commas</relevant_indices>
     """
     try:
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
+        response = client.chat.completions.create(
+            model="qwen-plus",
             max_tokens=50,
-            messages=[{"role": "user", "content": prompt}, {"role": "assistant", "content": "<relevant_indices>"}],
+            messages=[
+                {"role": "user", "content": prompt},
+                {"role": "assistant", "content": "<relevant_indices>"},
+            ],
             temperature=0,
-            stop_sequences=["</relevant_indices>"]
+            stop=["</relevant_indices>"]
         )
         
         # Extract the indices from the response
-        response_text = response.content[0].text.strip()
+        response_text = response.choices[0].message.content.strip()
         indices_str = response_text
         relevant_indices = []
         for idx in indices_str.split(','):
