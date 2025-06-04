@@ -1,8 +1,11 @@
-from anthropic import Anthropic
+from openai import OpenAI
 import os
 import re
 
-client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+client = OpenAI(
+    api_key=os.getenv("DASHSCOPE_API_KEY"),
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
 
 def llm_call(prompt: str, system_prompt: str = "", model="claude-3-5-sonnet-20241022") -> str:
     """
@@ -16,16 +19,20 @@ def llm_call(prompt: str, system_prompt: str = "", model="claude-3-5-sonnet-2024
     Returns:
         str: The response from the language model.
     """
-    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    messages = [{"role": "user", "content": prompt}]
-    response = client.messages.create(
+    client = OpenAI(
+        api_key=os.getenv("DASHSCOPE_API_KEY"),
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    )
+    response = client.chat.completions.create(
         model=model,
         max_tokens=4096,
-        system=system_prompt,
-        messages=messages,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
         temperature=0.1,
     )
-    return response.content[0].text
+    return response.choices[0].message.content
 
 def extract_xml(text: str, tag: str) -> str:
     """

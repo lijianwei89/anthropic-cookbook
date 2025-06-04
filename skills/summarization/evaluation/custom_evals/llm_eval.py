@@ -1,4 +1,4 @@
-import anthropic
+from openai import OpenAI
 import os
 import json
 from typing import Dict, TypedDict, Union, Any
@@ -14,7 +14,10 @@ def llm_eval(summary, input):
     Returns:
     bool: True if the average score is above the threshold, False otherwise.
     """
-    client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = OpenAI(
+        api_key=os.getenv("DASHSCOPE_API_KEY"),
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+    )
     
     # You could include an example here too and likely improve performance further!
     prompt = f"""Evaluate the following summary based on these criteria:
@@ -52,24 +55,18 @@ def llm_eval(summary, input):
     
     Evaluation (JSON format):"""
     
-    response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+    response = client.chat.completions.create(
+        model="qwen-plus",
         max_tokens=1000,
         temperature=0,
         messages=[
-            {
-                "role": "user",
-                "content": prompt
-            },
-            {
-                "role": "assistant",
-                "content": "<json>" 
-            }
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": "<json>"},
         ],
-        stop_sequences=["</json>"]
+        stop=["</json>"]
     )
-    
-    evaluation = json.loads(response.content[0].text)
+
+    evaluation = json.loads(response.choices[0].message.content)
     # Filter out non-numeric values and calculate the average
     numeric_values = [value for key, value in evaluation.items() if isinstance(value, (int, float))]
     avg_score = sum(numeric_values) / len(numeric_values)
