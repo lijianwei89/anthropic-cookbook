@@ -1,14 +1,14 @@
 # Anthropic Cookbook
 
-The Anthropic Cookbook provides code and guides designed to help developers build with Claude, offering copy-able code snippets that you can easily integrate into your own projects.
+The Anthropic Cookbook provides code and guides designed to help developers build with Claude, offering copy-able code snippets that you can easily integrate into your own projects. This fork demonstrates using the Qwen3 API via the OpenAI compatible endpoint.
 
 ## Prerequisites
 
-To make the most of the examples in this cookbook, you'll need an Anthropic API key (sign up for free [here](https://www.anthropic.com)).
+To make the most of the examples in this cookbook, you'll need a DashScope API key for Qwen3. Set it in the environment variable `DASHSCOPE_API_KEY`.
 
-While the code examples are primarily written in Python, the concepts can be adapted to any programming language that supports interaction with the Anthropic API.
+While the code examples are primarily written in Python, the concepts can be adapted to any programming language that supports interaction with the OpenAI compatible API.
 
-If you're new to working with the Anthropic API, we recommend starting with our [Anthropic API Fundamentals course](https://github.com/anthropics/courses/tree/master/anthropic_api_fundamentals) to get a solid foundation.
+If you're new to working with Qwen3, refer to the [DashScope documentation](https://help.aliyun.com/zh/dashscope/) for a solid foundation.
 
 ## Explore Further
 
